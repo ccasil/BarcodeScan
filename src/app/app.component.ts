@@ -1,23 +1,87 @@
-import { Component } from '@angular/core';
-import { NgxBarcodeScannerService } from '@eisberg-labs/ngx-barcode-scanner';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import * as Tesseract from 'tesseract.js';
+// @ts-ignore
+import * as Quagga from 'quagga';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
 
-  success: string | undefined; // Status code '000'
+  quagga: any;
+  success: any | undefined; // Status code '000'
   imagesubmit: any;
   error: string | undefined;
   error1: string | undefined;
   serialnumber: string | undefined;
 
   constructor(
-    service: NgxBarcodeScannerService
   ){}
+  ngOnInit(): void {
+  }
+
+  startCamera(){
+    this.resetButton();
+    Quagga.init({
+      inputStream: {
+        type: "LiveStream",
+        target: '#inputBarcode',
+        constraints: {
+          width: 640,
+          height: 480,
+          facingMode: "environment" // or user
+        }
+      },
+      locator: {
+        patchSize: "medium",
+        halfSample: true
+      },
+      numOfWorkers: 2,
+      decoder: {
+        readers: ["code_128_reader"]
+      },
+      locate: true
+    },  (err: any) => {
+      if (err) {
+        return console.log(err);
+      }
+      console.log("Initialization finished. Ready to start");
+      Quagga.start();
+      // Quagga.onProcessed(function (result: { boxes: any[]; box: any; codeResult: { code: any; }; line: any; }) {
+      //   var drawingCtx = Quagga.canvas.ctx.overlay,
+      //     drawingCanvas = Quagga.canvas.dom.overlay;
+      //   if (result) {
+      //     if (result.boxes) {
+      //       drawingCtx.clearRect(0, 0, parseInt(drawingCanvas.getAttribute("width")), parseInt(drawingCanvas.getAttribute("height")));
+      //       result.boxes.filter(function (box: any) {
+      //         return box !== result.box;
+      //       }).forEach(function (box: any) {
+      //         Quagga.ImageDebug.drawPath(box, { x: 0, y: 1 }, drawingCtx, { color: "green", lineWidth: 2 });
+      //       });
+      //     }
+  
+      //     if (result.box) {
+      //       Quagga.ImageDebug.drawPath(result.box, { x: 0, y: 1 }, drawingCtx, { color: "#00F", lineWidth: 2 });
+      //     }
+  
+      //     if (result.codeResult && result.codeResult.code) {
+      //       Quagga.ImageDebug.drawPath(result.line, { x: 'x', y: 'y' }, drawingCtx, { color: 'red', lineWidth: 3 });
+      //       Quagga.onDetected((res: { codeResult: { code: any; }; }) => {
+      //         console.log('barcode', res.codeResult.code)
+      //       });
+      //     }
+      //   }
+      // });
+      Quagga.onDetected((result: any) => {
+        var code = result.codeResult.code;
+        console.log(code);
+        this.success = code;
+        Quagga.stop();
+      });
+    });
+  }
 
  barcodeButton(event: any): void {
   this.success = 'Scanning Image';
@@ -31,26 +95,27 @@ export class AppComponent {
 
     reader.onload = (event) => { // called once readAsDataURL is completed
 
-      // console.log(event);
-      // this.imagesubmit = event['target']['result'];
-      // this.quagga = Quagga.decodeSingle({
-      //   decoder: {
-      //       readers: ['code_128_reader'] // List of active readers
-      //   },
-      //     locate: true, // try to locate the barcode in the image
-      //     src: this.imagesubmit // or 'data:image/jpg;base64,' + data
-      //   }, (result: any) => {
-      //   // console.log(result.codeResult);
-      //   if (result.codeResult) {
-      //       console.log('result', result.codeResult.code);
-      //       this.success = result.codeResult.code;
-      //       this.serialnumber = result.codeResult.code;
-      //   } else {
-      //       console.log('Barcode not detected');
-      //       this.error = 'Barcode not detected';
-      //       this.picButton();
-      //   }
-      // });
+      console.log(event);
+      // @ts-ignore
+      this.imagesubmit = event['target']['result'];
+      this.quagga = Quagga.decodeSingle({
+        decoder: {
+            readers: ['code_128_reader'] // List of active readers
+        },
+          locate: true, // try to locate the barcode in the image
+          src: this.imagesubmit // or 'data:image/jpg;base64,' + data
+        }, (result: any) => {
+        // console.log(result.codeResult);
+        if (result.codeResult) {
+            console.log('result', result.codeResult.code);
+            this.success = result.codeResult.code;
+            this.serialnumber = result.codeResult.code;
+        } else {
+            console.log('Barcode not detected');
+            this.error = 'Barcode not detected';
+            this.picButton();
+        }
+      });
     };
   }
   // if (this.quagga !== false) {
@@ -61,7 +126,7 @@ export class AppComponent {
   // }
  }
 
- picButton(): void {
+ picButton($event?: any): void {
   this.success = 'Scanning Image';
   // console.log(event);
   // if (event.target.files && event.target.files[0]) {
@@ -119,22 +184,12 @@ export class AppComponent {
   // });
   // console.log(this.imagesubmit);
  }
-  onStartButtonPress() {
-    this.service.start(this.quaggaConfig, 0.1)
-  }
-
-  onValueChanges(detectedValue: string) {
-    console.log("Found this: " + detectedValue)
-  }
-
-  onStopButtonPress() {
-    this.service.stop()
-  }
 
  resetButton(): void {
   this.error = '';
   this.error1 = '';
   this.serialnumber = '';
   this.success = '';
+  this.imagesubmit = null;
  }
 }

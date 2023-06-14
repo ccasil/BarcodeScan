@@ -1,17 +1,28 @@
-<ngx-barcode-scanner [(value)]="value" [codes]="['code_128', 'ean', 'upc', 'upc_e', 'ean_8']" [errorThreshold]="0.1" (exception)="onError($event)"></ngx-barcode-scanner>
+
+<form id="snForm0" name="snForm0">
+  <!-- <img class="mb-3 img-fluid w-100" src="./assets/images/graph.png" alt=""> -->
+  <input type="text" class="form-control mb-2" name="serialnumber" [(ngModel)]="serialnumber"
+    placeholder="Serial Number">
+  <input class="btn btn-primary badge-pill px-4 me-3" type="submit" data-toggle="modal" data-target="#snModal"
+    value="SUBMIT" [disabled]="!serialnumber">
+  <button class="btn btn-light badge-pill ml-3 px-4" (click)="resetButton()">clear</button>
+</form>
+<div *ngIf="error" class="mb-1 alert alert-danger" role="alert" innerHTML="{{error | json}}"></div>
+<div *ngIf="error1" class="mb-1 alert alert-danger" role="alert" innerHTML="{{error1 | json}}"></div>
+<div *ngIf="success" class="mb-0 alert alert-success" role="alert" innerHTML="{{ success | json }}"></div>
+<br>
 <div class="custom-file mb-2">
   <!-- <input type="file" class="custom-file-input" id="customFile" accept="image/*;capture=camera"
     (change)="picButton($event)" name="imagesubmit"> -->
   <input type="file" class="custom-file-input" id="customFile" accept="image/*;capture=camera"
     (change)="barcodeButton($event)" name="imagesubmit">
-  <label class="custom-file-label" for="customFile">Choose file</label>
+  <!-- <label class="custom-file-label" for="customFile">Choose file</label> -->
 </div>
+<br>
+<button class="btn btn-light badge-pill ml-3 px-4" (click)="startCamera()">Start Camera</button>
+<br>
+<div id="inputBarcode" style="position: static">
+  <!-- <div id="interactive" class="viewport"></div> -->
+</div>
+<br>
 <img *ngIf="imagesubmit" [src]="imagesubmit" class="img-fluid my-2 scanheight">
-<form id="snForm0" name="snForm0">
-  <!-- <img class="mb-3 img-fluid w-100" src="./assets/images/graph.png" alt=""> -->
-  <input type="text" class="form-control mb-2" name="serialnumber" [(ngModel)]="serialnumber"
-    placeholder="Serial Number">
-  <input class="btn btn-primary badge-pill px-4 me-3" type="submit" data-toggle="modal"
-    data-target="#snModal" value="SUBMIT" [disabled]="!serialnumber">
-  <button class="btn btn-light badge-pill ml-3 px-4" (click)="resetButton()">clear</button>
-</form>
