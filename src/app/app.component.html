@@ -3,13 +3,13 @@
   <!-- <img class="mb-3 img-fluid w-100" src="./assets/images/graph.png" alt=""> -->
   <input type="text" class="form-control mb-2" name="serialnumber" [(ngModel)]="serialnumber"
     placeholder="Serial Number">
-  <input class="btn btn-primary badge-pill px-4 me-3" type="submit" data-toggle="modal" data-target="#snModal"
-    value="SUBMIT" [disabled]="!serialnumber">
+  <!-- <input class="btn btn-primary badge-pill px-4 me-3" type="submit" data-toggle="modal" data-target="#snModal"
+    value="SUBMIT" [disabled]="!serialnumber"> -->
   <button class="btn btn-light badge-pill ml-3 px-4" (click)="resetButton()">clear</button>
+  <span *ngIf="success" class="mb-0 alert alert-success" role="alert" innerHTML="{{ success | json }}"></span>
 </form>
 <div *ngIf="error" class="mb-1 alert alert-danger" role="alert" innerHTML="{{error | json}}"></div>
 <div *ngIf="error1" class="mb-1 alert alert-danger" role="alert" innerHTML="{{error1 | json}}"></div>
-<div *ngIf="success" class="mb-0 alert alert-success" role="alert" innerHTML="{{ success | json }}"></div>
 <br>
 <div class="custom-file mb-2">
   <!-- <input type="file" class="custom-file-input" id="customFile" accept="image/*;capture=camera"

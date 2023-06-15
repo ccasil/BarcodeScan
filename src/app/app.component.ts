@@ -40,7 +40,14 @@ export class AppComponent implements OnInit {
       },
       numOfWorkers: 2,
       decoder: {
-        readers: ["code_128_reader"]
+        readers: ["code_128_reader"],
+        debug: {
+          drawBoundingBox: true,
+          showFrequency: true,
+          drawScanline: true,
+          showPattern: true
+      },
+      multiple: false
       },
       locate: true
     },  (err: any) => {
